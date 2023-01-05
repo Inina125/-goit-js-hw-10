@@ -8,28 +8,30 @@ const searchEl = document.querySelector('#search-box');
 const countryList = document.querySelector('.country-list');
 const countryEl = document.querySelector('.country-info');
 
-
-
-const handleInput = (e) => {
+const handleInput = e => {
   const searchQuery = e.target.value.trim();
+  if (searchQuery.length === 0) {
+    return;
+  }
   fetchCountries(searchQuery)
     .then(data => {
       countryList.innerHTML = '';
       countryEl.innerHTML = '';
       if (data.length > 10) {
-        Notiflix.Notify.info("Too many matches found. Please enter a more specific name.");
+        Notiflix.Notify.info(
+          'Too many matches found. Please enter a more specific name.'
+        );
       } else if (data.length === 1) {
-        renderCountry(data)
+        renderCountry(data);
       } else {
-        renderCountryList(data)
+        renderCountryList(data);
       }
     })
     .catch(error => {
-      Notiflix.Notify.failure("Oops, there is no country with that name");
-    })
-}
-const handleDebounce = debounce(handleInput,300);
-
+      Notiflix.Notify.failure('Oops, there is no country with that name');
+    });
+};
+const handleDebounce = debounce(handleInput, 300);
 
 function renderCountryList(countries) {
   const markup = countries
@@ -39,13 +41,15 @@ function renderCountryList(countries) {
           <p class='country-name'>${name.official}</p>
         </li>`;
     })
-    .join("");
-  countryList.insertAdjacentHTML("beforeend", markup);
+    .join('');
+  countryList.insertAdjacentHTML('beforeend', markup);
 }
 
 function renderCountry(countries) {
+  console.log(countries);
   const markup = countries
-    .map(({ name, capital , population , flags, languages }) => {
+    .map(({ name, capital, population, flags, languages }) => {
+      const langList = Object.values(languages).join(', ');
       return `<li class='country'>
           <div class='country-item'>
             <img class='country-image' src="${flags.svg}" />
@@ -53,11 +57,11 @@ function renderCountry(countries) {
           </div>
           <p><b>Capital</b>: ${capital}</p>
           <p><b>Population</b>: ${population}</p>
-          <p><b>Languages</b>: ${languages}
+          <p><b>Languages</b>: ${langList}
         </li>`;
     })
-    .join("");
-  countryList.insertAdjacentHTML("beforeend", markup);
+    .join('');
+  countryList.insertAdjacentHTML('beforeend', markup);
 }
 
-searchEl.addEventListener('input',handleDebounce)
+searchEl.addEventListener('input', handleDebounce);
